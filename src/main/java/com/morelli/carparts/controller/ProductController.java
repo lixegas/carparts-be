@@ -1,48 +1,63 @@
 package com.morelli.carparts.controller;
 
 import com.morelli.carparts.model.dto.ProductDTO;
-
-import com.morelli.carparts.model.entity.Product;
 import com.morelli.carparts.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/storage/product")
 @AllArgsConstructor
 public class ProductController {
 
-    private ProductService productService;
+    private final ProductService productService;
 
-    // GET PRODUCT (ALERT: IF IT NOT EXIST)
-    //IT WORKS
+    // GET all products with optional filtering
     @GetMapping("/")
-    public ResponseEntity<ProductDTO> getProduct(@RequestParam Long barCode) {
-        return productService.getProductByQrCode(barCode);
+    public ResponseEntity<List<ProductDTO>> getProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(required = false) String color,
+            @RequestParam(required = false) String productSize,
+            @RequestParam(required = false) String productName) {
+
+        List<ProductDTO> productDTOs = productService.getAll(page, size, color, productSize, productName);
+        return ResponseEntity.ok(productDTOs);
     }
 
-    // CREATE PRODUCT (ALERT: IF ALREADY EXIST, IF IS NOT VALID)
-    //IT WORKS
+
+    // GET product by barcode
+    @GetMapping("/{barCode}")
+    public ResponseEntity<ProductDTO> getProductByBarcode(@PathVariable Long barCode) {
+        ProductDTO productDTO = productService.getProductByBarCode(barCode);
+        return ResponseEntity.ok(productDTO);
+    }
+
+
+    // POST create product
     @PostMapping("/")
-    public ResponseEntity<Product> addProduct(@Valid @RequestBody ProductDTO productDTO) {
-        return productService.createProduct(productDTO);
+    public ResponseEntity<ProductDTO> addProduct(@Valid @RequestBody ProductDTO productDTO) {
+        ProductDTO createdProduct = productService.add(productDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 
-    // MODIFY PRODUCT (ALERT: IF PRODUCT WITH THIS BARCODE IS NOT FOUND)
-    // TODO: TO CHECK
-    @PutMapping("/put")
-    public ResponseEntity<Product> updateProduct(@RequestParam Long barCode, @RequestBody ProductDTO productDTO) {
-        return productService.updateProduct(barCode, productDTO);
+    // PUT update product
+    @PutMapping("/{barCode}")
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long barCode, @RequestBody ProductDTO productDTO) {
+        ProductDTO updatedProduct = productService.update(barCode, productDTO);
+        return ResponseEntity.ok(updatedProduct);
     }
 
-    //DELETE PRODUCT (MESSAGE: DELETING SUCCESSFULLY)
-    //IT WORKS
-    @DeleteMapping("/delete")
-    public void deleteProduct(@RequestParam Long barCode) {
-        productService.deleteProduct(barCode);
+    // DELETE product
+    @DeleteMapping("/{barCode}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long barCode) {
+        productService.delete(barCode);
+        return ResponseEntity.noContent().build();
     }
-
-
 }
+

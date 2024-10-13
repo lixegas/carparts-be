@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -22,7 +24,6 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
-
     @Column(name = "description")
     private String description;
 
@@ -40,6 +41,12 @@ public class Product {
 
     @Column(name = "unit_price")
     private Double unitPrice;
+
+    @Column(name = "save_timestamp")
+    private Instant saveTimestamp;
+
+    @Column(name = "update_timestamp")
+    private Instant updateTimestamp;
 }
 
 
