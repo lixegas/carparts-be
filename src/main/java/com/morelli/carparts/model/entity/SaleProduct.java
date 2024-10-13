@@ -3,34 +3,36 @@ package com.morelli.carparts.model.entity;
 
 import jakarta.persistence.*;
 
-
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.time.Instant;
 
 @Entity
-@IdClass(SaleProductId.class)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "sale_product")
 public class SaleProduct {
 
     @Id
-    @Column(name = "sale_id")
-    private Long saleId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
 
-    @Id
-    @Column(name = "bar_code")
-    private Long barCode;
+    @ManyToOne
+    @JoinColumn(name = "sale_id", referencedColumnName = "sale_id", nullable = false)
+    private Sale sale;
+
+    @ManyToOne
+    @JoinColumn(name = "bar_code", referencedColumnName = "bar_code", nullable = false)
+    private Product product;
 
     @Column(name = "quantity_sold")
     private Integer quantitySold;
 
-
-    @ManyToOne
-    @JoinColumn(name = "sale_id")
-    private Sale sale;
+    @Column(name = "save_timestamp")
+    private Instant saveTimestamp;
 }
 
 
