@@ -22,7 +22,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -57,27 +60,37 @@ public class SaleProductService {
 
     @Transactional
     public SaleDTO newSale(SaleRequest saleRequest) {
+        Set<Long> seenBarCodes = new HashSet<>();
+
+        for (SaleItemRequest request : saleRequest.getProducts()) {
+            Long barCode = request.getBarCode();
+            if (seenBarCodes.contains(barCode)) {
+                throw new IllegalArgumentException("Duplicate product with barcode: " + barCode + " found in the sale request.");
+            }
+            seenBarCodes.add(barCode);
+        }
+
         Sale sale = new Sale();
         sale.setSaleDate(Instant.now());
 
         double totalSaleAmount = 0.0;
 
         for (SaleItemRequest request : saleRequest.getProducts()) {
-            ProductDTO productDTO = productService.getProductByBarCode(request.getBarCode());
-            if (productDTO == null) {
+            Optional<Product> optionalProduct = productRepository.findByBarCode(request.getBarCode());
+            if (optionalProduct.isEmpty()) {
                 throw new EntityNotFoundException("Product with barcode " + request.getBarCode() + " not found.");
             }
 
+            Product product = optionalProduct.get();
             int requestedQuantity = request.getQuantity();
-            int availableQuantity = productDTO.getQuantity();
+            int availableQuantity = product.getQuantity();
 
             if (availableQuantity < requestedQuantity) {
-                throw new IllegalArgumentException("Not enough quantity for product: " + productDTO.getProductName());
+                throw new IllegalArgumentException("Not enough quantity for product: " + product.getProductName());
             }
 
-            productDTO.setQuantity(availableQuantity - requestedQuantity);
-
-            Product product = productMapper.mapToEntity(productDTO);
+            product.setQuantity(availableQuantity - requestedQuantity);
+            product.setUpdateTimestamp(Instant.now());
             productRepository.save(product);
 
             SaleProduct saleProduct = new SaleProduct();
