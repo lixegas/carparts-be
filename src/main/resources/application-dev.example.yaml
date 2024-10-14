@@ -3,3 +3,18 @@ spring:
     url:
     username:
     password:
+    driver-class-name:
+
+  redis:
+    host:
+    port:
+
+  cloud:
+    aws:
+      s3:
+        endpoint:
+      credentials:
+        access-key:
+        secret-key:
+      region:
+        static:

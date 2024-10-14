@@ -5,7 +5,7 @@ target/
 !**/src/test/**/target/
 
 # Ignore the file application-dev.yaml
-resources/application-dev.yaml
+application-dev.yaml
 
 docker-co/volume
 
