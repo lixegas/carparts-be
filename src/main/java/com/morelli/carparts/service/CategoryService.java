@@ -7,7 +7,9 @@ import com.morelli.carparts.repository.CategoryRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -65,6 +67,10 @@ public class CategoryService {
     }
 
     // Delete category by ID
+    @Caching(evict = {
+            @CacheEvict(value = "categories", key = "#id"),
+            @CacheEvict(value = "categories", allEntries = true)
+    })
     public void delete(Long id) {
         Category existingCategory = categoryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + id));
