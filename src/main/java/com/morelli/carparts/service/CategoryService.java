@@ -23,7 +23,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     public final CategoryMapper categoryMapper;
 
-    // Get all categories - ora restituisce una lista di CategoryDTO
+    // Get all categories -
     @Cacheable(value = "categories")
     public List<CategoryDTO> getAll() {
         List<Category> categories = categoryRepository.findAll();
@@ -41,6 +41,7 @@ public class CategoryService {
     }
 
     // Add new category
+    @CacheEvict(value = "categories", allEntries = true)
     public CategoryDTO add(CategoryDTO categoryDTO) {
         boolean categoryExists = categoryRepository.existsByName(categoryDTO.getName());
         if (categoryExists) {
@@ -48,20 +49,24 @@ public class CategoryService {
         }
         Category category = categoryMapper.toCategory(categoryDTO);
         category.setSaveTimestamp(Instant.now());
+        category.setUpdateTimestamp(null);
         Category savedCategory = categoryRepository.save(category);
 
         return categoryMapper.toDTO(savedCategory);
     }
 
-    // Update category by ID
+    // Update category
+    @Caching(evict = {
+            @CacheEvict(value = "categories", allEntries = true),
+            @CacheEvict(value = "categories", key = "#id")
+    })
     public CategoryDTO update(Long id, CategoryDTO categoryDTO) {
         Category existingCategory = categoryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + id));
 
         categoryMapper.updateCategoryFromDTO(categoryDTO, existingCategory);
-        existingCategory.setUpdateTimestamp(Instant.now());
-        Category categorySaved = categoryRepository.save(existingCategory);
 
+        Category categorySaved = categoryRepository.save(existingCategory);
 
         return categoryMapper.toDTO(categorySaved);
     }

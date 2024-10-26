@@ -6,6 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
+import java.time.Instant;
 
 
 @Named("categoryMapper")
@@ -16,8 +17,15 @@ public interface CategoryMapper {
     @Mapping(target = "products", ignore = true)
     Category toCategory(CategoryDTO categoryDTO);
 
+
     CategoryDTO toDTO(Category category);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "saveTimestamp", ignore = true)
+    @Mapping(target = "updateTimestamp", expression = "java(getCurrentInstant())")
     void updateCategoryFromDTO(CategoryDTO categoryDTO, @MappingTarget Category category);
+
+    default Instant getCurrentInstant() {
+        return Instant.now();
+    }
 }

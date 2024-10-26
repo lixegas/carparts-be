@@ -13,4 +13,6 @@ import java.time.Instant;
 public class CategoryDTO implements Serializable {
     private Long id;
     private String name;
+    private Instant saveTimestamp;
+    private Instant updateTimestamp;
 }
