@@ -1,10 +1,12 @@
 package com.morelli.carparts.model.dto;
 
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 @Data
 @AllArgsConstructor
@@ -19,6 +21,7 @@ public class ProductDTO implements Serializable {
     private Integer quantity;
     private Double unitCost;
     private Double unitPrice;
-
+    private Instant saveTimestamp;
+    private Instant updateTimestamp;
 }
 

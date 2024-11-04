@@ -11,6 +11,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -57,6 +58,7 @@ public class ProductService {
 
     // Add a new product
     // FUNZIONA
+    @CacheEvict(value = "products", allEntries = true)
     public ProductDTO add(ProductDTO productDTO) {
         Optional<Product> optionalProduct = productRepository.findByBarCode(productDTO.getBarCode());
 
@@ -70,14 +72,18 @@ public class ProductService {
 
         Product product = productMapper.mapToEntity(productDTO);
         product.setSaveTimestamp(Instant.now());
+        product.setUpdateTimestamp(null);
         Product savedProduct = productRepository.save(product);
-
 
         return productMapper.toProductResponse(savedProduct);
     }
 
     // Update existing product
     // FUNZIONA
+    @Caching(evict = {
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "products", key = "#barCode")
+    })
     public ProductDTO update(Long barCode, ProductDTO productDTO) {
         Product existingProduct = productRepository.findByBarCode(barCode)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found with barCode: " + barCode));
@@ -88,17 +94,17 @@ public class ProductService {
             existingProduct.setCategory(existingCategory);
         }
 
-        Product updatedProduct = productMapper.updateProductFromDto(productDTO, existingProduct);
-        updatedProduct.setUpdateTimestamp(Instant.now());
-        Product savedProduct = productRepository.save(updatedProduct);
-
+        productMapper.updateProductFromDto(productDTO, existingProduct);
+        Product savedProduct = productRepository.save(existingProduct);
 
         return productMapper.toProductResponse(savedProduct);
     }
 
     // Delete product by barcode
-    @CacheEvict(value = "products", key = "#barCode")
-    // FUNZIONA
+    @Caching(evict = {
+            @CacheEvict(value = "products", key = "#barCode"),
+            @CacheEvict(value = "products", allEntries = true)
+    })
     public void delete(Long barCode) {
         Product existingProduct = productRepository.findByBarCode(barCode)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found with barCode: " + barCode));

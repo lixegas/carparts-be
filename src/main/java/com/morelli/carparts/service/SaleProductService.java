@@ -17,6 +17,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +60,7 @@ public class SaleProductService {
     }
 
     @Transactional
+    @CacheEvict(value = "sales", allEntries = true)
     public SaleDTO newSale(SaleRequest saleRequest) {
         Set<Long> seenBarCodes = new HashSet<>();
 
@@ -111,7 +113,10 @@ public class SaleProductService {
         return saleProductMapper.mapToResponse(sale);
     }
 
-    @CacheEvict(value = "sales", key = "#saleId")
+    @Caching(evict = {
+            @CacheEvict(value = "sales", key = "#saleId"),
+            @CacheEvict(value = "sales", allEntries = true)
+    })
     public void deleteSaleProducts(Long saleId) {
         List<SaleProduct> saleProducts = saleProductRepository.findBySaleId(saleId);
         if (saleProducts.isEmpty()) {

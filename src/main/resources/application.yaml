@@ -1,5 +1,5 @@
 server:
-  port: 3340
+  port: 8086
   error:
     include-stacktrace: never
     include-message: always

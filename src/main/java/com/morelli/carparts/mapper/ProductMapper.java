@@ -4,6 +4,8 @@ import com.morelli.carparts.model.dto.ProductDTO;
 import com.morelli.carparts.model.entity.Product;
 import org.mapstruct.*;
 
+import java.time.Instant;
+
 @Named("productMapper")
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
@@ -24,5 +26,11 @@ public interface ProductMapper {
     Product mapToEntity(ProductDTO productDTO);
 
     @Mapping(target = "barCode", ignore = true)
-    Product updateProductFromDto(ProductDTO productCreationRequest, @MappingTarget Product product);
+    @Mapping(target = "saveTimestamp", ignore = true)
+    @Mapping(target = "updateTimestamp", expression = "java(getCurrentInstant())")
+    void updateProductFromDto(ProductDTO productDTO, @MappingTarget Product product);
+
+    default Instant getCurrentInstant() {
+        return Instant.now();
+    }
 }
