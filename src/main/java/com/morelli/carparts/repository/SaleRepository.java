@@ -11,9 +11,6 @@ import java.util.List;
 
 @Repository
 public interface SaleRepository extends JpaRepository<Sale, Long> {
-
-    @Query("SELECT s FROM Sale s " +
-            "WHERE s.saleDate  " +
-            "BETWEEN :start AND :end")
-    List<Sale> findBySaveTimestampBetween(@Param("start") Instant start, @Param("end") Instant end);
+    @Query("SELECT s FROM Sale s WHERE s.saleDate BETWEEN :start AND :end")
+    List<Sale> findBySaleDateBetween(@Param("start") Instant start, @Param("end") Instant end);
 }

@@ -27,10 +27,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                      Pageable pageable);
 
 
+    @Query("SELECT p FROM Product p WHERE p.saveTimestamp BETWEEN :start AND :end")
+    List<Product> findBySaveTimestampBetween(@Param("start") Instant start, @Param("end") Instant end);
 
-    @Query("SELECT p FROM Product p " +
-            "WHERE p.updateTimestamp " +
-            "BETWEEN :start AND :end")
+    @Query("SELECT p FROM Product p WHERE p.updateTimestamp BETWEEN :start AND :end")
     List<Product> findByUpdateTimestampBetween(@Param("start") Instant start, @Param("end") Instant end);
 }
 

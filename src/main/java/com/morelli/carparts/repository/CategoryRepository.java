@@ -16,10 +16,10 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     boolean existsByName(String name);
 
+    @Query("SELECT c FROM Category c WHERE c.saveTimestamp BETWEEN :start AND :end")
+    List<Category> findBySaveTimestampBetween(@Param("start") Instant start, @Param("end") Instant end);
 
-    @Query("SELECT c FROM Category c " +
-            "WHERE c.updateTimestamp " +
-            "BETWEEN :start AND :end")
+    @Query("SELECT c FROM Category c WHERE c.updateTimestamp BETWEEN :start AND :end")
     List<Category> findByUpdateTimestampBetween(@Param("start") Instant start, @Param("end") Instant end);
 
 }

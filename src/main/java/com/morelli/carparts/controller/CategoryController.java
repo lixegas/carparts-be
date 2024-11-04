@@ -2,8 +2,6 @@ package com.morelli.carparts.controller;
 
 
 import com.morelli.carparts.model.dto.CategoryDTO;
-import com.morelli.carparts.model.entity.Category;
-import com.morelli.carparts.repository.CategoryRepository;
 import com.morelli.carparts.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;

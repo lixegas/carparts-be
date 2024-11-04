@@ -88,7 +88,7 @@ public class SaleProductService {
             int availableQuantity = product.getQuantity();
 
             if (availableQuantity < requestedQuantity) {
-                throw new IllegalArgumentException("Not enough quantity for product: " + product.getProductName());
+                throw new IllegalArgumentException("Not enough quantity for product: " + product.getBarCode());
             }
 
             product.setQuantity(availableQuantity - requestedQuantity);

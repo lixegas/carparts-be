@@ -1,8 +1,5 @@
 package com.morelli.carparts.controller;
 
-
-import com.morelli.carparts.model.entity.FileMetadata;
-import com.morelli.carparts.repository.FileMetadataRepository;
 import com.morelli.carparts.service.S3Service;
 
 import lombok.AllArgsConstructor;
@@ -11,11 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Objects;
 
 
 @RestController
