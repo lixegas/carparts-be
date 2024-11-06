@@ -7,8 +7,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FileMetadataRepository extends JpaRepository<FileMetadata, Long> {
-    boolean existsByFileName(String fileName);
-
     void deleteByFileName(String fileName);
 }
 

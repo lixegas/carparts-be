@@ -1,14 +1,14 @@
 package com.morelli.carparts.config;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
-
-import java.net.URI;
 
 @Configuration
 public class S3Config {
@@ -16,20 +16,21 @@ public class S3Config {
     @Value("${spring.cloud.aws.s3.endpoint}")
     private String s3Endpoint;
 
-    @Value("${spring.cloud.aws.s3.access-key}")
+    @Value("${spring.cloud.aws.access-key}")
     private String accessKeyId;
 
-    @Value("${spring.cloud.aws.s3.secret-key}")
+    @Value("${spring.cloud.aws.secret-key}")
     private String secretAccessKey;
 
 
     @Bean
-    public S3Client s3Client() {
-        return S3Client.builder()
-                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKeyId, secretAccessKey)))
-                .region(Region.of("us-east-1"))
-                .endpointOverride(URI.create(s3Endpoint))
-                .build();
+    public AmazonS3 amazonS3() {
+        AWSCredentials credentials = new BasicAWSCredentials(accessKeyId, secretAccessKey);
+        AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard();
+        builder.setCredentials(new AWSStaticCredentialsProvider(credentials));
+        builder.setEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(s3Endpoint, "us-east-1"));
+        builder.setPathStyleAccessEnabled(true);
+        return builder.build();
     }
 }
 
